@@ -1,0 +1,192 @@
+{
+  "id": null,
+  "uid": "kai-reliability-lab",
+  "title": "Rail Reliability Lab \u2014 SLI / SLO / Failure",
+  "schemaVersion": 39,
+  "version": 1,
+  "refresh": "5s",
+  "timezone": "browser",
+  "time": {
+    "from": "now-15m",
+    "to": "now"
+  },
+  "tags": [
+    "demo",
+    "sre"
+  ],
+  "panels": [
+    {
+      "id": 1,
+      "title": "HTTP 5xx rate by architecture (%)",
+      "type": "timeseries",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 0
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "demo-prometheus"
+      },
+      "targets": [
+        {
+          "expr": "100 * sum by (mode) (rate(demo_http_requests_total{path=\"/search\",status=~\"5..\"}[1m])) / clamp_min(sum by (mode) (rate(demo_http_requests_total{path=\"/search\"}[1m])), 0.000001)",
+          "refId": "A",
+          "legendFormat": "{{mode}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent"
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        }
+      }
+    },
+    {
+      "id": 2,
+      "title": "GOOD journey SLI (%) \u2014 degraded is NOT good",
+      "type": "timeseries",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 0
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "demo-prometheus"
+      },
+      "targets": [
+        {
+          "expr": "100 * sum by (mode) (rate(demo_journey_results_total{outcome=\"good\"}[1m])) / clamp_min(sum by (mode) (rate(demo_journey_results_total[1m])), 0.000001)",
+          "refId": "A",
+          "legendFormat": "{{mode}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent"
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        }
+      }
+    },
+    {
+      "id": 3,
+      "title": "P95 journey search latency (seconds)",
+      "type": "timeseries",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 8
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "demo-prometheus"
+      },
+      "targets": [
+        {
+          "expr": "histogram_quantile(0.95, sum by (le,mode) (rate(demo_request_duration_seconds_bucket{path=\"/search\"}[1m])))",
+          "refId": "A",
+          "legendFormat": "{{mode}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "s"
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        }
+      }
+    },
+    {
+      "id": 4,
+      "title": "Bad journey outcomes per second",
+      "type": "timeseries",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 8
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "demo-prometheus"
+      },
+      "targets": [
+        {
+          "expr": "sum by (mode,outcome) (rate(demo_journey_results_total{outcome!=\"good\"}[1m]))",
+          "refId": "A",
+          "legendFormat": "{{mode}} / {{outcome}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "reqps"
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        }
+      }
+    },
+    {
+      "id": 5,
+      "title": "Traffic per second",
+      "type": "timeseries",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 16
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "demo-prometheus"
+      },
+      "targets": [
+        {
+          "expr": "sum by (mode) (rate(demo_http_requests_total{path=\"/search\"}[1m]))",
+          "refId": "A",
+          "legendFormat": "{{mode}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "reqps"
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        }
+      }
+    }
+  ],
+  "annotations": {
+    "list": []
+  }
+}

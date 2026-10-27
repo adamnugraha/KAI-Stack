@@ -1,0 +1,27 @@
+groups:
+  - name: kai-demo
+    rules:
+      - alert: DemoHighHTTPErrorRate
+        expr: |
+          (
+            sum by(mode) (rate(demo_http_requests_total{path="/search",status=~"5.."}[1m]))
+            /
+            sum by(mode) (rate(demo_http_requests_total{path="/search"}[1m]))
+          ) > 0.05
+        for: 30s
+        labels:
+          severity: warning
+        annotations:
+          summary: 'Synthetic demo: high HTTP 5xx for {{ $labels.mode }}'
+      - alert: DemoBadJourneyOutcomes
+        expr: |
+          (
+            sum by(mode) (rate(demo_journey_results_total{outcome!="good"}[1m]))
+            /
+            sum by(mode) (rate(demo_journey_results_total[1m]))
+          ) > 0.01
+        for: 30s
+        labels:
+          severity: warning
+        annotations:
+          summary: 'Synthetic demo: bad journey outcomes for {{ $labels.mode }}'
